@@ -1,0 +1,6 @@
+{
+    "name": "kafkareader",
+    "class": "com.bjhm.datax.plugin.writer.kafkareader.KafkaReader",
+    "description": "reader data to kafka",
+    "developer": "bjhm"
+}
