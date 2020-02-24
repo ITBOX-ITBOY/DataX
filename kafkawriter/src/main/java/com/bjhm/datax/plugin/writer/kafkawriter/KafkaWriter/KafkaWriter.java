@@ -20,20 +20,26 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * @ClassName: KafkaWriter
- * @Author: majun
- * @CreateDate: 2019/2/20 11:06
- * @Version: 1.0
- * @Description: datax kafkawriter
+ * kafka写数据的插件
  */
-
 public class KafkaWriter extends Writer {
 
+    /**
+     * Job部分，作业部分
+     */
     public static class Job extends Writer.Job {
-
+        //日志框架
         private static final Logger logger = LoggerFactory.getLogger(Job.class);
+        //配置对象
         private Configuration conf = null;
 
+        /**
+         * 对作业进行切分
+         * @param mandatoryNumber
+         *            为了做到Reader、Writer任务数对等，这里要求Writer插件必须按照源端的切分数进行切分。否则框架报错！
+         *
+         * @return
+         */
         @Override
         public List<Configuration> split(int mandatoryNumber) {
             List<Configuration> configurations = new ArrayList<Configuration>(mandatoryNumber);
@@ -43,11 +49,17 @@ public class KafkaWriter extends Writer {
             return configurations;
         }
 
+        /**
+         * 验证参数是否正确
+         */
         private void validateParameter() {
             this.conf.getNecessaryValue(Key.BOOTSTRAP_SERVERS, KafkaWriterErrorCode.REQUIRED_VALUE);
             this.conf.getNecessaryValue(Key.TOPIC, KafkaWriterErrorCode.REQUIRED_VALUE);
         }
 
+        /**
+         * 初始化
+         */
         @Override
         public void init() {
             this.conf = super.getPluginJobConf();
@@ -62,6 +74,9 @@ public class KafkaWriter extends Writer {
         }
     }
 
+    /*
+        Task部分，任务
+     */
     public static class Task extends Writer.Task {
         private static final Logger logger = LoggerFactory.getLogger(Task.class);
         private static final String NEWLINE_FLAG = System.getProperty("line.separator", "\n");
@@ -100,12 +115,13 @@ public class KafkaWriter extends Writer {
 
                 try {
                     if (!topicsResult.names().get().contains(topic)) {
-                        new NewTopic(
+                        NewTopic newTopic = new NewTopic(
                                 topic,
                                 Integer.valueOf(conf.getUnnecessaryValue(Key.TOPIC_NUM_PARTITION, "1", null)),
                                 Short.valueOf(conf.getUnnecessaryValue(Key.TOPIC_REPLICATION_FACTOR, "1", null))
                         );
                         List<NewTopic> newTopics = new ArrayList<NewTopic>();
+                        newTopics.add(newTopic);
                         AdminClient.create(props).createTopics(newTopics);
                     }
                 } catch (Exception e) {
@@ -133,7 +149,7 @@ public class KafkaWriter extends Writer {
                             record.toString())
                     );
                 }
-//                logger.info("complete write " + record.toString());
+              logger.info("complete write " + record.toString());
                 producer.flush();
             }
         }
