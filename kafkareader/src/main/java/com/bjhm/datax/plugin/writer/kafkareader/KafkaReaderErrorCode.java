@@ -1,4 +1,4 @@
-package com.bjhm.datax.plugin.writer.kafkareader.KafkaReader;
+package com.bjhm.datax.plugin.writer.kafkareader;
 
 import com.alibaba.datax.common.spi.ErrorCode;
 

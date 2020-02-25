@@ -1,4 +1,4 @@
-package com.bjhm.datax.plugin.writer.kafkareader.KafkaReader;
+package com.bjhm.datax.plugin.writer.kafkareader;
 
 /**
  * @ClassName: Key
