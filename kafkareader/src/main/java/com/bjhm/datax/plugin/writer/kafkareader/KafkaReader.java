@@ -79,7 +79,7 @@ public class KafkaReader extends Reader {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 
                 for (ConsumerRecord<String, String> record : records) {
-                    logger.info("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
+                    logger.info("offset = "+record.offset()+"---"+ "key = "+record.key()+"----"+ "value ="+ record.value());
                     Record record1 = recordSender.createRecord();
                     record1.addColumn(new LongColumn(record.offset()));
                     record1.addColumn(new StringColumn(record.key()));
