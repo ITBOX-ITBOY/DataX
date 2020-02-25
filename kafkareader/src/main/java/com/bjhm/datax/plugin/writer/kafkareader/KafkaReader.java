@@ -57,7 +57,6 @@ public class KafkaReader extends Reader {
 
     public static class Task extends Reader.Task {
         private static final Logger logger = LoggerFactory.getLogger(Task.class);
-        private static final String NEWLINE_FLAG = System.getProperty("line.separator", "\n");
 
         private KafkaConsumer<String, String> consumer;
         private Configuration conf;
@@ -73,16 +72,8 @@ public class KafkaReader extends Reader {
             props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
             props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
             props.put("enable.auto.commit", "false");
-            KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
+            consumer = new KafkaConsumer<String, String>(props);
             consumer.subscribe(Arrays.asList(conf.getString(Key.TOPIC)));
-        }
-
-
-        @Override
-        public void destroy() {
-            if (consumer != null) {
-                consumer.close();
-            }
         }
 
 
@@ -104,5 +95,12 @@ public class KafkaReader extends Reader {
 
             }
         }
+        @Override
+        public void destroy() {
+            if (consumer != null) {
+                consumer.close();
+            }
+        }
+
     }
 }
