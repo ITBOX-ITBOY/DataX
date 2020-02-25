@@ -1,4 +1,4 @@
-package com.bjhm.datax.plugin.writer.kafkawriter.KafkaWriter;
+package com.bjhm.datax.plugin.writer.kafkawriter;
 
 import com.alibaba.datax.common.element.Column;
 import com.alibaba.datax.common.element.Record;
