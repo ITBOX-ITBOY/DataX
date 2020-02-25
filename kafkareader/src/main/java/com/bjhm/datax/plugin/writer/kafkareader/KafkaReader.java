@@ -81,9 +81,13 @@ public class KafkaReader extends Reader {
                 for (ConsumerRecord<String, String> record : records) {
                     logger.info("offset = "+record.offset()+"---"+ "key = "+record.key()+"----"+ "value ="+ record.value());
                     Record record1 = recordSender.createRecord();
-                    record1.addColumn(new LongColumn(record.offset()));
-                    record1.addColumn(new StringColumn(record.key()));
-                    record1.addColumn(new StringColumn(record.value()));
+                    String[] splits = record.value().split(" ");
+//                    record1.addColumn(new LongColumn(record.offset()));
+//                    record1.addColumn(new StringColumn(record.key()));
+                    for (String split : splits) {
+                        record1.addColumn(new StringColumn(split));
+                    }
+
                     recordSender.sendToWriter(record1);
                     logger.info("缓存记录------------"+record1.toString());
                     consumer.commitSync();
