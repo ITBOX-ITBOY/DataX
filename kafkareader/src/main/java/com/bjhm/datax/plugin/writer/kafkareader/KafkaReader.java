@@ -86,14 +86,13 @@ public class KafkaReader extends Reader {
 //                    record1.addColumn(new LongColumn(record.offset()));
 //                    record1.addColumn(new StringColumn(record.key()));
                     for (String split : splits) {
-                        logger.info(split.toString());
                         record1.addColumn(new StringColumn(split));
                     }
                     recordSender.sendToWriter(record1);
                     logger.info("缓存记录------------"+record1.toString());
                     consumer.commitSync();
                 }
-
+                recordSender.flush();
             }
         }
         @Override
