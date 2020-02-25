@@ -34,6 +34,8 @@ public class Key {
 
     public static final String VALUESERIALIZER = "valueSerializer";
 
+    public static final String GROUP_ID="groupId";
+
     // not must , not default
     public static final String FIELD_DELIMITER = "fieldDelimiter";
 

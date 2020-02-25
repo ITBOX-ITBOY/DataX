@@ -13,11 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
-
+import java.util.*;
 
 
 public class KafkaReader extends Reader {
@@ -68,7 +64,7 @@ public class KafkaReader extends Reader {
 
             props = new Properties();
             props.put("bootstrap.servers", conf.getString(Key.BOOTSTRAP_SERVERS));
-//            props.put("group.id", groupId != null ? groupId : UUID.randomUUID().toString());
+            props.put("group.id", conf.getString(Key.GROUP_ID) != null ? conf.getString(Key.GROUP_ID)  : UUID.randomUUID().toString());
             props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
             props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
             props.put("enable.auto.commit", "false");
