@@ -83,10 +83,11 @@ public class KafkaReader extends Reader {
                     logger.info("offset = "+record.offset()+"---"+ "key = "+record.key()+"----"+ "value ="+ record.value());
                     Record record1 = recordSender.createRecord();
                     String[] splits = record.value().split(" ");
+                    String[] splits1 = record.value().split("\t");
 //                    record1.addColumn(new LongColumn(record.offset()));
 //                    record1.addColumn(new StringColumn(record.key()));
                     for (String split : splits) {
-                        logger.info("-------------------------"+split);
+                        logger.info("-------------------------"+split+"---"+splits.length+"------"+splits1);
                         record1.addColumn(new StringColumn(split));
                     }
                     recordSender.sendToWriter(record1);
