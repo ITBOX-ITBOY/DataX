@@ -98,7 +98,7 @@ public class KafkaReader extends Reader {
                     record1.addColumn(new StringColumn(record.key()));
                     record1.addColumn(new StringColumn(record.value()));
                     recordSender.sendToWriter(record1);
-                    logger.info(record1.toString());
+                    logger.info("缓存记录------------"+record1.toString());
                     consumer.commitSync();
                 }
 
