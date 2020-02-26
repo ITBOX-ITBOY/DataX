@@ -99,9 +99,9 @@ public class KafkaReader extends Reader {
         }
         @Override
         public void destroy() {
-            if (consumer != null) {
-                consumer.close();
-            }
+//            if (consumer != null) {
+//                consumer.close();
+//            }
         }
 
     }
