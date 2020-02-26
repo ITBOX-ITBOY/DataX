@@ -273,6 +273,7 @@ public class CommonRdbmsWriter {
             try {
                 Record record;
                 while ((record = recordReceiver.getFromReader()) != null) {
+                    LOG.info("开始读取记录"+record.getColumnNumber());
                     if (record.getColumnNumber() != this.columnNumber) {
                         // 源头读取字段列数与目的表字段写入列数不相等，直接报错
                         throw DataXException
@@ -283,7 +284,7 @@ public class CommonRdbmsWriter {
                                                 record.getColumnNumber(),
                                                 this.columnNumber));
                     }
-
+                    LOG.info("向buffer中写入数据");
                     writeBuffer.add(record);
                     bufferBytes += record.getMemorySize();
 
@@ -295,16 +296,19 @@ public class CommonRdbmsWriter {
                 }
                 if (!writeBuffer.isEmpty()) {
                     doBatchInsert(connection, writeBuffer);
+                    LOG.info("开始批量写入");
                     writeBuffer.clear();
                     bufferBytes = 0;
                 }
             } catch (Exception e) {
+                LOG.info("---------走了异常-----------");
                 throw DataXException.asDataXException(
                         DBUtilErrorCode.WRITE_DATA_ERROR, e);
             } finally {
                 writeBuffer.clear();
                 bufferBytes = 0;
                 DBUtil.closeDBResources(null, null, connection);
+                LOG.info("-------------关闭finally--------------");
             }
         }
 
@@ -316,7 +320,9 @@ public class CommonRdbmsWriter {
                     this.jdbcUrl, username, password);
             DBUtil.dealWithSessionConfig(connection, writerSliceConfig,
                     this.dataBaseType, BASIC_MESSAGE);
+            LOG.info("----------------准备开始写记录--------------------");
             startWriteWithConnection(recordReceiver, taskPluginCollector, connection);
+            LOG.info("----------------记录写入完成--------------------");
         }
 
 

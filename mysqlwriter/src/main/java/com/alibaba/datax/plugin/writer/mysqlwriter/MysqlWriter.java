@@ -8,6 +8,7 @@ import com.alibaba.datax.plugin.rdbms.writer.CommonRdbmsWriter;
 import com.alibaba.datax.plugin.rdbms.writer.Key;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 
 //TODO writeProxy
