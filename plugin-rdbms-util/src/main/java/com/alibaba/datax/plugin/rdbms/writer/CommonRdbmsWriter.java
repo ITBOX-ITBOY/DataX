@@ -289,14 +289,17 @@ public class CommonRdbmsWriter {
                     bufferBytes += record.getMemorySize();
 
                     if (writeBuffer.size() >= batchSize || bufferBytes >= batchByteSize) {
+                        LOG.info("开始指insert开始");
                         doBatchInsert(connection, writeBuffer);
                         writeBuffer.clear();
+                        LOG.info("开始指insert结束");
                         bufferBytes = 0;
                     }
                 }
                 if (!writeBuffer.isEmpty()) {
+                    LOG.info("开始批量写入开始");
                     doBatchInsert(connection, writeBuffer);
-                    LOG.info("开始批量写入");
+                    LOG.info("开始批量写入线束");
                     writeBuffer.clear();
                     bufferBytes = 0;
                 }
