@@ -67,8 +67,8 @@ public class KafkaWriter extends Writer {
             //获取分区数量，按分区进行切分
 
             logger.info("获取默认值1----------"+this.conf.getString(Key.TOPIC_NUM_PARTITION, "1"));
-            logger.info("获取默认值2----------"+conf.getInt(this.conf.getString(Key.TOPIC_NUM_PARTITION, "1")));
-            Integer partitions = conf.getInt(this.conf.getString(Key.TOPIC_NUM_PARTITION, "1"));
+            String s = this.conf.getString(Key.TOPIC_NUM_PARTITION, "1");
+            Integer partitions =Integer.valueOf(s);
             logger.info("partitions-----------"+partitions);
             for (int i = 0; i < partitions; i++) {
                 configurations.add(conf);
