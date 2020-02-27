@@ -65,7 +65,7 @@ public class KafkaWriter extends Writer {
         public List<Configuration> split(int mandatoryNumber) {
             List<Configuration> configurations = new ArrayList<Configuration>(mandatoryNumber);
             //获取分区数量，按分区进行切分
-            Integer partitions = conf.getInt(this.conf.getUnnecessaryValue(Key.TOPIC_NUM_PARTITION, "0", null));
+            Integer partitions = conf.getInt(this.conf.getUnnecessaryValue(Key.TOPIC_NUM_PARTITION, "1", null));
             for (int i = 0; i < partitions; i++) {
                 configurations.add(conf);
             }
