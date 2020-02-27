@@ -26,8 +26,10 @@ public class KafkaReader extends Reader {
 
         @Override
         public List<Configuration> split(int mandatoryNumber) {
-            List<Configuration> configurations = new ArrayList<Configuration>(mandatoryNumber);
-            for (int i = 0; i < mandatoryNumber; i++) {
+            List<Configuration> configurations = new ArrayList<Configuration>();
+            String s = this.conf.getString(Key.TOPIC_NUM_PARTITION, "1");
+            Integer partitions =Integer.valueOf(s);
+            for (int i = 0; i < partitions; i++) {
                 configurations.add(conf);
             }
             return configurations;

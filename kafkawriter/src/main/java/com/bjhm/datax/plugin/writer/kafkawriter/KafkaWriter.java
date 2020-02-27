@@ -66,10 +66,8 @@ public class KafkaWriter extends Writer {
             List<Configuration> configurations = new ArrayList<Configuration>(mandatoryNumber);
             //获取分区数量，按分区进行切分
 
-            logger.info("获取默认值1----------"+this.conf.getString(Key.TOPIC_NUM_PARTITION, "1"));
             String s = this.conf.getString(Key.TOPIC_NUM_PARTITION, "1");
             Integer partitions =Integer.valueOf(s);
-            logger.info("partitions-----------"+partitions);
             for (int i = 0; i < partitions; i++) {
                 configurations.add(conf);
             }
@@ -104,6 +102,9 @@ public class KafkaWriter extends Writer {
             kafkaSetParams();
         }
 
+        public List<Configuration> split(int mandatoryNumber){
+            return null;
+        }
         /**
          * kafka参数配置
          */
@@ -162,14 +163,12 @@ public class KafkaWriter extends Writer {
                 //获取一行数据，按照指定分隔符 拼成字符串 发送出去
                 if (conf.getUnnecessaryValue(Key.WRITE_TYPE, WriteType.TEXT.name(), null).toLowerCase()
                         .equals(WriteType.TEXT.name().toLowerCase())) {
-                    logger.info("我走了发送的 text");
                     producer.send(new ProducerRecord<String, String>(this.conf.getString(Key.TOPIC),
                             recordToString(record),
                             recordToString(record))
                     );
                 } else if (conf.getUnnecessaryValue(Key.WRITE_TYPE, WriteType.TEXT.name(), null).toLowerCase()
                         .equals(WriteType.JSON.name().toLowerCase())) {
-                    logger.info("我走了text的json");
                     producer.send(new ProducerRecord<String, String>(this.conf.getString(Key.TOPIC),
                             recordToString(record),
                             record.toString())
@@ -203,7 +202,7 @@ public class KafkaWriter extends Writer {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < recordLength; i++) {
                 column = record.getColumn(i);
-                sb.append(column.asString()).append(fieldDelimiter);
+               sb.append(column.asString()).append(fieldDelimiter);
             }
 
             sb.setLength(sb.length() - 1);
