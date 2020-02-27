@@ -1,12 +1,5 @@
 package com.bjhm.datax.plugin.writer.kafkareader;
 
-/**
- * @ClassName: Key
- * @Author: majun
- * @CreateDate: 2019/2/20 11:17
- * @Version: 1.0
- * @Description: TODO
- */
 
 public class Key {
 //
