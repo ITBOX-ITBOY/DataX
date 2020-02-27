@@ -34,39 +34,43 @@ public class KafkaWriter extends Writer {
         private Configuration conf = null;
 
         /**
-         * 对作业进行切分
-         * @param mandatoryNumber
-         *            为了做到Reader、Writer任务数对等，这里要求Writer插件必须按照源端的切分数进行切分。否则框架报错！
-         *
-         * @return
+         * 框架初始化
          */
         @Override
-        public List<Configuration> split(int mandatoryNumber) {
-            List<Configuration> configurations = new ArrayList<Configuration>(mandatoryNumber);
-            for (int i = 0; i < mandatoryNumber; i++) {
-                configurations.add(conf);
-            }
-            return configurations;
+        public void init() {
+            //获取用户的自定义配置信息
+            this.conf = super.getPluginJobConf();
+            logger.info("kafka writer params:{}", conf.toJSON());
+            this.validateParameter();
         }
 
         /**
          * 验证参数是否正确
          */
         private void validateParameter() {
+            //验证服务地址列表信息
             this.conf.getNecessaryValue(Key.BOOTSTRAP_SERVERS, KafkaWriterErrorCode.REQUIRED_VALUE);
+            //获取并判断topic是否为空
             this.conf.getNecessaryValue(Key.TOPIC, KafkaWriterErrorCode.REQUIRED_VALUE);
         }
 
         /**
-         * 初始化
+         * 对作业进行切分
+         *
+         * @param mandatoryNumber 为了做到Reader、Writer任务数对等，这里要求Writer插件必须按照源端的切分数进行切分。否则框架报错！
+         * @return
          */
-        @Override
-        public void init() {
-            this.conf = super.getPluginJobConf();
-            logger.info("kafka writer params:{}", conf.toJSON());
-            this.validateParameter();
-        }
 
+        @Override
+        public List<Configuration> split(int mandatoryNumber) {
+            List<Configuration> configurations = new ArrayList<Configuration>(mandatoryNumber);
+            //获取分区数量，按分区进行切分
+            Integer partitions = conf.getInt(this.conf.getUnnecessaryValue(Key.TOPIC_NUM_PARTITION, "0", null));
+            for (int i = 0; i < partitions; i++) {
+                configurations.add(conf);
+            }
+            return configurations;
+        }
 
         @Override
         public void destroy() {
@@ -88,9 +92,18 @@ public class KafkaWriter extends Writer {
 
         @Override
         public void init() {
+            //获取自定义配置信息
             this.conf = super.getPluginJobConf();
+            //获取分割符
             fieldDelimiter = conf.getUnnecessaryValue(Key.FIELD_DELIMITER, "\t", null);
+            //kafka参数初始化
+            kafkaSetParams();
+        }
 
+        /**
+         * kafka参数配置
+         */
+        private void kafkaSetParams() {
             props = new Properties();
             props.put("bootstrap.servers", conf.getString(Key.BOOTSTRAP_SERVERS));
             props.put("acks", conf.getUnnecessaryValue(Key.ACK, "0", null));//这意味着leader需要等待所有备份都成功写入日志，这种策略会保证只要有一个备份存活就不会丢失数据。这是最强的保证。
@@ -108,28 +121,35 @@ public class KafkaWriter extends Writer {
 
         @Override
         public void prepare() {
-            if (Boolean.valueOf(conf.getUnnecessaryValue(Key.NO_TOPIC_CREATE, "false", null))) {
+            //获取topic列表
+            ListTopicsResult topicsResult = AdminClient.create(props).listTopics();
+            //判断topic是否为空
+            String topic = conf.getNecessaryValue(Key.TOPIC, KafkaWriterErrorCode.REQUIRED_VALUE);
 
-                ListTopicsResult topicsResult = AdminClient.create(props).listTopics();
-                String topic = conf.getNecessaryValue(Key.TOPIC, KafkaWriterErrorCode.REQUIRED_VALUE);
-
-                try {
-                    if (!topicsResult.names().get().contains(topic)) {
-                        NewTopic newTopic = new NewTopic(
-                                topic,
-                                Integer.valueOf(conf.getUnnecessaryValue(Key.TOPIC_NUM_PARTITION, "1", null)),
-                                Short.valueOf(conf.getUnnecessaryValue(Key.TOPIC_REPLICATION_FACTOR, "1", null))
-                        );
-                        List<NewTopic> newTopics = new ArrayList<NewTopic>();
-                        newTopics.add(newTopic);
-                        AdminClient.create(props).createTopics(newTopics);
-                    }
-                } catch (Exception e) {
-                    throw new DataXException(KafkaWriterErrorCode.CREATE_TOPIC, KafkaWriterErrorCode.REQUIRED_VALUE.getDescription());
+            try {
+                //判断topic列表中是否存配置文件中配置的topic
+                if (!topicsResult.names().get().contains(topic)) {
+                    /* 如topic不存在就创建一个 */
+                    NewTopic newTopic = new NewTopic(
+                            topic,
+                            Integer.valueOf(conf.getUnnecessaryValue(Key.TOPIC_NUM_PARTITION, "1", null)),
+                            Short.valueOf(conf.getUnnecessaryValue(Key.TOPIC_REPLICATION_FACTOR, "1", null))
+                    );
+                    List<NewTopic> newTopics = new ArrayList<NewTopic>();
+                    newTopics.add(newTopic);
+                    /* 创建topic */
+                    AdminClient.create(props).createTopics(newTopics);
                 }
+            } catch (Exception e) {
+                throw new DataXException(KafkaWriterErrorCode.CREATE_TOPIC, KafkaWriterErrorCode.REQUIRED_VALUE.getDescription());
             }
         }
 
+        /**
+         * 开始写数据
+         *
+         * @param lineReceiver
+         */
         @Override
         public void startWrite(RecordReceiver lineReceiver) {
             logger.info("start to writer kafka");
@@ -138,19 +158,22 @@ public class KafkaWriter extends Writer {
                 //获取一行数据，按照指定分隔符 拼成字符串 发送出去
                 if (conf.getUnnecessaryValue(Key.WRITE_TYPE, WriteType.TEXT.name(), null).toLowerCase()
                         .equals(WriteType.TEXT.name().toLowerCase())) {
+                    logger.info("我走了发送的 text");
                     producer.send(new ProducerRecord<String, String>(this.conf.getString(Key.TOPIC),
                             recordToString(record),
                             recordToString(record))
                     );
                 } else if (conf.getUnnecessaryValue(Key.WRITE_TYPE, WriteType.TEXT.name(), null).toLowerCase()
                         .equals(WriteType.JSON.name().toLowerCase())) {
+                    logger.info("我走了text的json");
                     producer.send(new ProducerRecord<String, String>(this.conf.getString(Key.TOPIC),
                             recordToString(record),
                             record.toString())
                     );
                 }
-              logger.info("complete write " + record.toString());
+                logger.info("complete write " + record.toString());
                 producer.flush();
+                logger.info("end to writer kafka");
             }
         }
 

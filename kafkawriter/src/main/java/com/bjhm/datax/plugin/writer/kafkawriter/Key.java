@@ -1,13 +1,8 @@
 package com.bjhm.datax.plugin.writer.kafkawriter;
 
 /**
- * @ClassName: Key
- * @Author: majun
- * @CreateDate: 2019/2/20 11:17
- * @Version: 1.0
- * @Description: TODO
+ *
  */
-
 public class Key {
 //
 //    bootstrapServers": "",
@@ -19,9 +14,9 @@ public class Key {
 //            "valueSerializer": "org.apache.kafka.common.serialization.StringSerializer",
 //            "fieldFelimiter": ","
 
+    // must have
     public static final String BOOTSTRAP_SERVERS="bootstrapServers";
 
-    // must have
     public static final String TOPIC = "topic";
 
     public static final String ACK = "ack";
@@ -34,10 +29,9 @@ public class Key {
 
     public static final String VALUESERIALIZER = "valueSerializer";
 
+
     // not must , not default
     public static final String FIELD_DELIMITER = "fieldDelimiter";
-
-    public static final String NO_TOPIC_CREATE = "noTopicCreate";
 
     public static final String TOPIC_NUM_PARTITION = "topicNumPartition";
 
