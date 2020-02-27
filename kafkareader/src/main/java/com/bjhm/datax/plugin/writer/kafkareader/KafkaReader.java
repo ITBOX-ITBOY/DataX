@@ -60,6 +60,7 @@ public class KafkaReader extends Reader {
         private KafkaConsumer<String, String> consumer;
         private Configuration conf;
         private Properties props;
+        private String fieldDelimiter;
 
         @Override
         public void init() {
@@ -73,6 +74,9 @@ public class KafkaReader extends Reader {
             props.put("enable.auto.commit", "false");
             consumer = new KafkaConsumer<String, String>(props);
             consumer.subscribe(Arrays.asList(conf.getString(Key.TOPIC)));
+
+            //获取分割符
+            fieldDelimiter = conf.getUnnecessaryValue(Key.FIELD_DELIMITER, "\t", null);
         }
 
 
@@ -82,11 +86,9 @@ public class KafkaReader extends Reader {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
 
                 for (ConsumerRecord<String, String> record : records) {
-                    logger.info("offset = "+record.offset()+"---"+ "key = "+record.key()+"----"+ "value ="+ record.value());
                     Record record1 = recordSender.createRecord();
-                    String[] splits = record.value().split("\t");
+                    String[] splits = record.value().split(fieldDelimiter);
                     for (String split : splits) {
-                        logger.info("-------------------------"+split+"---"+splits.length);
                         record1.addColumn(new StringColumn(split));
                     }
                     recordSender.sendToWriter(record1);
