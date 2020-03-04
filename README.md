@@ -58,7 +58,8 @@ DataX目前已经有了比较全面的插件体系，主流的RDBMS数据库、N
 |              | Elasticsearch       |         |     √     |[写](https://github.com/alibaba/DataX/blob/master/elasticsearchwriter/doc/elasticsearchwriter.md)|
 | 时间序列数据库 | OpenTSDB | √ |  |[读](https://github.com/alibaba/DataX/blob/master/opentsdbreader/doc/opentsdbreader.md)|
 |  | TSDB | √ | √ |[读](https://github.com/alibaba/DataX/blob/master/tsdbreader/doc/tsdbreader.md) 、[写](https://github.com/alibaba/DataX/blob/master/tsdbwriter/doc/tsdbhttpwriter.md)|
-
+| 消息队列
+|  | kafka |     √     |     √     |[读](https://github.com/ITBOX-ITBOY/DataX/blob/master/kafkareader/doc/kafkareader.md) 、[写](https://github.com/ITBOX-ITBOY/DataX/blob/master/kafkawriter/doc/kafkawriter.md)|
 # 我要开发新的插件
 请点击：[DataX插件开发宝典](https://github.com/alibaba/DataX/blob/master/dataxPluginDev.md)
 
