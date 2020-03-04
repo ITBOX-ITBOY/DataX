@@ -111,7 +111,7 @@ public class KafkaWriter extends Writer {
         private void kafkaSetParams() {
             props = new Properties();
             props.put("bootstrap.servers", conf.getString(Key.BOOTSTRAP_SERVERS));
-            props.put("acks", conf.getUnnecessaryValue(Key.ACK, "0", null));//这意味着leader需要等待所有备份都成功写入日志，这种策略会保证只要有一个备份存活就不会丢失数据。这是最强的保证。
+            props.put("acks", conf.getUnnecessaryValue(Key.ACK, "-1", null));
             props.put("retries", conf.getUnnecessaryValue(Key.RETRIES, "0", null));
             // Controls how much bytes sender would wait to batch up before publishing to Kafka.
             //控制发送者在发布到kafka之前等待批处理的字节数。

@@ -1,18 +1,6 @@
 package com.bjhm.datax.plugin.writer.kafkawriter;
 
-/**
- *
- */
 public class Key {
-//
-//    bootstrapServers": "",
-//            "topic": "",
-//            "ack": "all",
-//            "batchSize": 1000,
-//            "retries": 0,
-//            "keySerializer":"org.apache.kafka.common.serialization.StringSerializer",
-//            "valueSerializer": "org.apache.kafka.common.serialization.StringSerializer",
-//            "fieldFelimiter": ","
 
     // must have
     public static final String BOOTSTRAP_SERVERS="bootstrapServers";

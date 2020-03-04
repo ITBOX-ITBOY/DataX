@@ -9,7 +9,7 @@ KakfaWriter提供向kafka中指定topic写数据。
 
 
 ## 2 功能与限制
-目前kafkaWriter支持向单个topic中写入文本类型数据或者json格式数据
+目前kafkaWriter支持向单个topic中写入文本类型数据或json数据
 
 ## 3 功能说明
 
@@ -17,49 +17,45 @@ KakfaWriter提供向kafka中指定topic写数据。
 ### 3.1 配置样例
 
 ```json
-{  
-   "job":{  
-      "setting":{  
-         "speed":{  
-            "channel":1
-         }
-      },
-      "content":[  
-         {  
-            "reader":{  
-               "name":"oraclereader",
-               "parameter":{  
-                  "username":"zkcj",
-                  "password":"zkcj2018",
-                  "connection":[  
-                     {  
-                        "jdbcUrl":[  
-                           "jdbc:oracle:thin:@10.1.20.169:1521:GYJG"
-                        ],
-                        "querySql":[  
-                           "select * from VM_DRV_PREASIGN_A"
-                        ]
-                     }
-                  ]
-               }
-            },
-            "writer":{ 
-		"name": "kafkawriter",
-			  "parameter": {
-			    "topic": "test-topic",
-			    "bootstrapServers": "10.1.20.150:9092",
-			    "fieldDelimiter":"\t",
-			    "batchSize":10,
-			     "writeType":"json",
-			    "noTopicCreate":true,
-			    "topicNumPartition":1,
-			    "topicReplicationFactor":1
-			  }
-		 }
-         }
-      ]
-   }
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "mysqlreader",
+          "parameter": {
+            "column": ["*"],
+            "connection": [
+              {
+                "jdbcUrl": ["jdbc:mysql://localhost:3306/datax"],
+                "table": ["student"]
+              }
+            ],
+            "password": "123456",
+            "username": "root"
+          }
+        },
+        "writer": {
+          "name": "kafkawriter",
+          "parameter": {
+            "ack": "all",
+            "batchSize": 1000,
+            "bootstrapServers": "192.168.1.110:9092",
+            "fieldFelimiter": ",",
+            "retries": 0,
+            "topic": "test"
+          }
+        }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "channel": "1"
+      }
+    }
+  }
 }
+
 ```
 
 ### 3.2 参数说明
@@ -122,7 +118,7 @@ KakfaWriter提供向kafka中指定topic写数据。
 
 * **keySerializer**
 
-	* 描述：键序列化，默认org.apache.kafka.common.serialization.StringSerializer<br />
+	* 描述：键序列化，默认org.apache.kafka.common.serialization.StringSerializer<br />,目前不支持其他类型的序列化
 
 	* 必选：否 <br />
 
@@ -130,19 +126,11 @@ KakfaWriter提供向kafka中指定topic写数据。
 
 * **valueSerializer**
 
-	* 描述：键序列化，默认org.apache.kafka.common.serialization.StringSerializer<br />
+	* 描述：键序列化，默认org.apache.kafka.common.serialization.StringSerializer<br />，目前不支持其他类型的序列化
 
 	* 必选：否 <br />
 
  	* 默认值：org.apache.kafka.common.serialization.StringSerializer <br />
-
-* **notopicCreate**
-
-	* 描述：当没有topic时，是否创建topic，默认false<br />
-
- 	* 必选：haveKerberos 为true必选 <br />
- 
- 	* 默认值：false <br />
 
 * **topicNumPartition**
 
@@ -373,19 +361,6 @@ KakfaWriter提供向kafka中指定topic写数据。
 
 
 ### 3.3 类型转换
-
-目前 HdfsWriter 支持大部分 Hive 类型，请注意检查你的类型。
-
-下面列出 HdfsWriter 针对 Hive 数据类型转换列表:
-
-| DataX 内部类型| HIVE 数据类型    |
-| -------- | -----  |
-| Long     |TINYINT,SMALLINT,INT,BIGINT |
-| Double   |FLOAT,DOUBLE |
-| String   |STRING,VARCHAR,CHAR |
-| Boolean  |BOOLEAN |
-| Date     |DATE,TIMESTAMP |
-
 
 ## 4 配置步骤
 
